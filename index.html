@@ -30,7 +30,11 @@
     --body: 'Inter', sans-serif;
     --mono: 'JetBrains Mono', monospace;
   }
-
+/* Add this to allow golden liquid waves to shine through your content */
+#about, #skills, #education, #contact, .exp-card {
+  background: rgba(255, 253, 249, 0.85) !important;
+  backdrop-filter: blur(8px);
+}
   *{ box-sizing:border-box; margin:0; padding:0; }
   html{ scroll-behavior:smooth; background:var(--bg); }
   body{
@@ -915,62 +919,91 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
     height = canvas.height = window.innerHeight;
   });
 
-  const ripples = [];
+  // Mouse tracking variables
+  let mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2, speed: 0 };
+  let lastMouse = { x: width / 2, y: height / 2 };
 
-  // Track cursor movement across full page
   window.addEventListener('mousemove', (e) => {
-    // Adds a smooth fluid oil wave on mouse movement
-    ripples.push({
-      x: e.clientX,
-      y: e.clientY,
-      radius: 4,
-      maxRadius: 110,
-      alpha: 0.55,
-      speed: 1.4,
-      waveOffset: Math.random() * Math.PI * 2
-    });
+    mouse.targetX = e.clientX;
+    mouse.targetY = e.clientY;
+
+    const dx = e.clientX - lastMouse.x;
+    const dy = e.clientY - lastMouse.y;
+    mouse.speed = Math.min(Math.sqrt(dx * dx + dy * dy), 50);
+
+    lastMouse.x = e.clientX;
+    lastMouse.y = e.clientY;
   });
 
+  // Fluid wave parameters
+  let time = 0;
+  const numWaves = 14;
+
   function animate() {
+    time += 0.012;
+
+    // Smoothly interpolate mouse position for realistic liquid inertia
+    mouse.x += (mouse.targetX - mouse.x) * 0.05;
+    mouse.y += (mouse.targetY - mouse.y) * 0.05;
+    mouse.speed *= 0.95; // Decay velocity
+
     ctx.clearRect(0, 0, width, height);
 
-    // Render soft ambient light-gold background sheen
-    const grad = ctx.createRadialGradient(width * 0.7, height * 0.2, 50, width * 0.5, height * 0.5, width);
-    grad.addColorStop(0, '#FFFBF2');
-    grad.addColorStop(0.5, '#F9F3E5');
-    grad.addColorStop(1, '#F2E5CA');
-    ctx.fillStyle = grad;
+    // 1. Rich Liquid Gold Ambient Background Base
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#FFFBF2');
+    bgGrad.addColorStop(0.4, '#F7EDD6');
+    bgGrad.addColorStop(0.8, '#EFE0BF');
+    bgGrad.addColorStop(1, '#E6D0A3');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
-    for (let i = ripples.length - 1; i >= 0; i--) {
-      const r = ripples[i];
-      r.radius += r.speed;
-      r.alpha -= 0.006;
+    // 2. Draw Organic Flowing Golden Liquid Silk Waves
+    for (let i = 0; i < numWaves; i++) {
+      ctx.beginPath();
+      
+      const waveHeight = 35 + i * 18;
+      const frequency = 0.002 + i * 0.0004;
+      const speed = time * (0.8 + i * 0.12);
 
-      if (r.alpha <= 0 || r.radius >= r.maxRadius) {
-        ripples.splice(i, 1);
-        continue;
+      // Gradient color for each liquid layer
+      const waveGrad = ctx.createLinearGradient(0, 0, width, 0);
+      waveGrad.addColorStop(0, `rgba(229, 170, 51, ${0.12 + (i % 3) * 0.06})`);
+      waveGrad.addColorStop(0.5, `rgba(184, 125, 20, ${0.18 + (i % 2) * 0.05})`);
+      waveGrad.addColorStop(1, `rgba(242, 210, 140, ${0.15 + (i % 4) * 0.04})`);
+
+      for (let x = 0; x <= width; x += 15) {
+        // Distance from current point to mouse cursor
+        const dx = x - mouse.x;
+        const distY = (waveHeight + (i * 45)) - mouse.y;
+        const dist = Math.sqrt(dx * dx + distY * distY);
+        
+        // Liquid distortion strength around cursor position
+        const mouseEffect = Math.exp(-dist / (180 + mouse.speed * 4)) * (80 + mouse.speed * 2.5);
+
+        // Calculate smooth wave elevation (sine blend)
+        const y = Math.sin(x * frequency + speed) * (25 + i * 4) +
+                  Math.cos(x * 0.001 - speed * 0.5) * 15 +
+                  (waveHeight + i * 50) +
+                  Math.sin((x - mouse.x) * 0.01) * mouseEffect;
+
+        if (x === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
       }
 
-      // Golden Oil Refraction Wave 1 (Inner Highlight)
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(229, 170, 51, ${r.alpha})`; // Warm Amber Gold
-      ctx.lineWidth = 3.5;
-      ctx.stroke();
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
 
-      // Golden Oil Refraction Wave 2 (Outer Liquid Ring)
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, Math.max(0, r.radius - 12), 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(184, 125, 20, ${r.alpha * 0.45})`; // Darker Viscous Edge
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      ctx.fillStyle = waveGrad;
+      ctx.fill();
 
-      // Subtle Soft Golden Glow
-      ctx.beginPath();
-      ctx.arc(r.x, r.y, Math.max(0, r.radius - 4), 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 235, 170, ${r.alpha * 0.6})`;
-      ctx.lineWidth = 1.5;
+      // Fluid Refraction Highlights along wave crests
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = `rgba(255, 245, 215, ${0.35 - i * 0.02})`;
       ctx.stroke();
     }
 
