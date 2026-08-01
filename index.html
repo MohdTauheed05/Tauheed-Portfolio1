@@ -13,11 +13,13 @@
 :root{
     --bg:#F9F4E8;
     --bg2:#FFFDF9;
+    --ink: #0F172A;        /* Very deep dark charcoal for main text */
+    --ink-dim: #334155;    /* Dark slate for secondary text */
     --surface:#FFFFFF;
     --surface2:#F4EAD3;
     --ink:#2C2214;
     --ink-dim:#63523D;
-    --amber:#D49B28;
+    --amber:#B45309;
     --amber2:#E6B84C;
     --rust:#8C5911;
     --oil:#E5AA33;
@@ -58,7 +60,12 @@
       radial-gradient(ellipse 60% 50% at 10% 90%, #BFE0F5 0%, transparent 55%),
       var(--bg);
   }
-
+/* Apply liquid ripple capability to headings and key text blocks */
+h1, h2, h3, .hero-content, .nav-logo {
+  filter: url(#liquid-ripple);
+  transition: filter 0.2s ease-out;
+  will-change: filter;
+}
   /* Update .hd-lube-bg */
 .hd-lube-bg{
     position:fixed; inset:0; z-index:1; 
@@ -361,7 +368,15 @@
 </style>
 </head>
 <body>
-
+<!-- SVG Liquid Displacement Filter -->
+<svg style="display:none;">
+  <defs>
+    <filter id="liquid-ripple">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise" />
+      <feDisplacementMap id="displacement-map" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>
 <canvas id="oil-ripple-canvas" style="position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none;"></canvas>
 <div class="grain"></div>
 <div class="cursor-dot" id="cursorDot"></div>
@@ -908,6 +923,7 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
 <script>
 (function() {
   const canvas = document.getElementById('oil-ripple-canvas');
+  const dispMap = document.getElementById('displacement-map');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
@@ -919,9 +935,11 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
     height = canvas.height = window.innerHeight;
   });
 
-  // Mouse tracking variables
+  // Mouse tracking
   let mouse = { x: width / 2, y: height / 2, targetX: width / 2, targetY: height / 2, speed: 0 };
   let lastMouse = { x: width / 2, y: height / 2 };
+  let targetScale = 0;
+  let currentScale = 0;
 
   window.addEventListener('mousemove', (e) => {
     mouse.targetX = e.clientX;
@@ -929,27 +947,36 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
 
     const dx = e.clientX - lastMouse.x;
     const dy = e.clientY - lastMouse.y;
-    mouse.speed = Math.min(Math.sqrt(dx * dx + dy * dy), 50);
+    mouse.speed = Math.sqrt(dx * dx + dy * dy);
+
+    // Calculate text ripple intensity based on cursor speed (cap at 25px distortion)
+    targetScale = Math.min(mouse.speed * 1.2, 25);
 
     lastMouse.x = e.clientX;
     lastMouse.y = e.clientY;
   });
 
-  // Fluid wave parameters
   let time = 0;
   const numWaves = 14;
 
   function animate() {
     time += 0.012;
 
-    // Smoothly interpolate mouse position for realistic liquid inertia
+    // Smooth inertia for mouse movement
     mouse.x += (mouse.targetX - mouse.x) * 0.05;
     mouse.y += (mouse.targetY - mouse.y) * 0.05;
-    mouse.speed *= 0.95; // Decay velocity
+    mouse.speed *= 0.95;
+
+    // Smoothly scale the text displacement filter down when mouse slows
+    targetScale *= 0.92;
+    currentScale += (targetScale - currentScale) * 0.1;
+    if (dispMap) {
+      dispMap.setAttribute('scale', currentScale.toFixed(2));
+    }
 
     ctx.clearRect(0, 0, width, height);
 
-    // 1. Rich Liquid Gold Ambient Background Base
+    // 1. Ambient Background Base
     const bgGrad = ctx.createLinearGradient(0, 0, width, height);
     bgGrad.addColorStop(0, '#FFFBF2');
     bgGrad.addColorStop(0.4, '#F7EDD6');
@@ -958,7 +985,7 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Draw Organic Flowing Golden Liquid Silk Waves
+    // 2. Liquid Silk Waves
     for (let i = 0; i < numWaves; i++) {
       ctx.beginPath();
       
@@ -966,32 +993,24 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
       const frequency = 0.002 + i * 0.0004;
       const speed = time * (0.8 + i * 0.12);
 
-      // Gradient color for each liquid layer
       const waveGrad = ctx.createLinearGradient(0, 0, width, 0);
       waveGrad.addColorStop(0, `rgba(229, 170, 51, ${0.12 + (i % 3) * 0.06})`);
       waveGrad.addColorStop(0.5, `rgba(184, 125, 20, ${0.18 + (i % 2) * 0.05})`);
       waveGrad.addColorStop(1, `rgba(242, 210, 140, ${0.15 + (i % 4) * 0.04})`);
 
       for (let x = 0; x <= width; x += 15) {
-        // Distance from current point to mouse cursor
         const dx = x - mouse.x;
         const distY = (waveHeight + (i * 45)) - mouse.y;
         const dist = Math.sqrt(dx * dx + distY * distY);
-        
-        // Liquid distortion strength around cursor position
         const mouseEffect = Math.exp(-dist / (180 + mouse.speed * 4)) * (80 + mouse.speed * 2.5);
 
-        // Calculate smooth wave elevation (sine blend)
         const y = Math.sin(x * frequency + speed) * (25 + i * 4) +
                   Math.cos(x * 0.001 - speed * 0.5) * 15 +
                   (waveHeight + i * 50) +
                   Math.sin((x - mouse.x) * 0.01) * mouseEffect;
 
-        if (x === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
 
       ctx.lineTo(width, height);
@@ -1001,7 +1020,6 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
       ctx.fillStyle = waveGrad;
       ctx.fill();
 
-      // Fluid Refraction Highlights along wave crests
       ctx.lineWidth = 1.2;
       ctx.strokeStyle = `rgba(255, 245, 215, ${0.35 - i * 0.02})`;
       ctx.stroke();
