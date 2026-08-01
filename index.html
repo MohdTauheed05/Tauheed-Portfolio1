@@ -164,47 +164,69 @@
   .hero-loc{ text-align:right; font-family:var(--mono); font-size:12px; color:var(--steel); }
   .hero-loc b{ color:var(--ink); display:block; font-size:13px; margin-bottom:3px; font-weight:500; }
 
-  /* ---------- PORTRAIT / CIRCULAR BEARING CONTAINER ---------- */
+  /* ---------- PORTRAIT CARD ---------- */
   .portrait-card{
     background:var(--surface); border:1px solid var(--line); border-radius:32px; padding:22px;
     box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .5s cubic-bezier(.2,.8,.2,1);
     max-width:320px; margin:0 auto;
   }
   
-  /* CIRCULAR BEARING FIX: Forces image to render inside a rotating circle */
-  .portrait-frame, 
-  .bearing-frame { 
-    border-radius: 50% !important; /* Enforces absolute circular shape */
-    overflow: hidden !important; 
+  .portrait-frame { 
+    border-radius: 20px;
+    overflow: hidden; 
     aspect-ratio: 1 / 1; 
     background: var(--bg2); 
     position: relative;
-    border: 2px solid var(--amber);
-    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+    border: 1px solid var(--line-strong);
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .portrait-frame img, 
-  .bearing-frame img { 
+  .portrait-frame img { 
     width: 100%; 
     height: 100%; 
     object-fit: cover; 
-    border-radius: 50%;
-    animation: rotateBearing 14s linear infinite; 
-  }
-
-  /* Motion spin keyframes for bearing animation */
-  @keyframes rotateBearing { 
-    0% { transform: rotate(0deg); } 
-    100% { transform: rotate(360deg); } 
+    transform: none;
+    animation: none;
   }
 
   .portrait-meta{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
   .portrait-name{ font-family:var(--display); font-weight:700; font-size:15px; color:var(--ink); }
   .portrait-role{ font-family:var(--mono); font-size:10.5px; color:var(--steel); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
   .portrait-dot{ width:10px; height:10px; border-radius:50%; background:#00E5FF; box-shadow:0 0 10px 2px rgba(0,229,255,0.6); }
+
+  /* ---------- CIRCULAR BEARING CONTAINER FIX ---------- */
+  .bearing-showcase {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+  }
+
+  .bearing-stage,
+  .bearing-ring { 
+    width: 280px;
+    height: 280px;
+    border-radius: 50% !important; /* Forces strict circular mask */
+    overflow: hidden !important; 
+    position: relative;
+    border: 2px solid var(--amber);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    clip-path: circle(50% at 50% 50%); /* Clean hard-clip boundary */
+  }
+
+  .bearing-ring img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    border-radius: 50% !important;
+    transform: none !important; /* Prevents unwanted rotations */
+    animation: none !important;
+  }
 
   /* ---------- SECTIONS ---------- */
   section{ padding:140px 0; perspective:1400px; }
@@ -341,7 +363,6 @@
     html{ scroll-behavior:auto; }
     .reveal{ transition:none; opacity:1; transform:none; }
     .cursor-dot{ display:none; }
-    .portrait-frame img, .bearing-frame img{ animation:none !important; }
   }
 </style>
 </head>
@@ -404,22 +425,14 @@
         <div class="hero-loc"><b>Al Ameer Tower, Industrial Area 1</b>Ajman, United Arab Emirates</div>
       </div>
     </div>
-    <div class="hero-grade">LUBRICANT — GRADE SN 150</div>
   </header>
 
   <section class="bearing-showcase">
     <div class="wrap bearing-showcase-inner">
       <div class="bearing-stage">
-        <div class="bearing-tilt">
-          <div class="bearing-ring">
-            <img src="images/bearing-oil-square.gif" alt="Precision bearing coated in flowing lubricant, rotating" loading="lazy" />
-          </div>
+        <div class="bearing-ring">
+          <img src="images/bearing-oil-square.gif" alt="Precision bearing coated in flowing lubricant" loading="lazy" />
         </div>
-        <div class="oil-drop d1"></div>
-        <div class="oil-drop d2"></div>
-        <div class="oil-drop d3"></div>
-        <div class="oil-drop d4"></div>
-        <div class="bearing-pool"></div>
       </div>
     </div>
   </section>
@@ -474,7 +487,6 @@
       </div>
     </div>
   </section>
-  <svg class="divider" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,18 C150,55 300,0 450,22 C600,44 750,4 900,24 C1000,36 1100,10 1200,20 L1200,0 L0,0 Z"></path></svg>
 
   <section id="experience">
     <div class="wrap">
@@ -577,17 +589,6 @@
     </div>
   </section>
 
-  <div class="video-band reveal">
-    <video autoplay muted loop playsinline preload="none" poster="">
-      <source src="https://assets.mixkit.co/videos/13935/13935-360.mp4" type="video/mp4" />
-    </video>
-    <div class="video-overlay">
-      <div class="eyebrow">In the field</div>
-      <h2>Precision in every drop.</h2>
-      <p>From base oil to finished lubricant — every batch moves through a chain of suppliers, checks, and timing calls.</p>
-    </div>
-  </div>
-
   <section id="skills">
     <div class="wrap">
       <div class="sec-head reveal">
@@ -653,7 +654,7 @@
 
 <footer>Mohd Tauheed — Procurement Engineer · 9 Years in Lubricants &amp; Industrial Sourcing</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 /* ---------------- NAV ---------------- */
 const nav = document.getElementById('nav');
@@ -739,166 +740,7 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
   });
 }
 
-/* ---------------- THREE.JS BEARING + OIL FLOW SCENE ---------------- */
-(function(){
-  const canvas = document.getElementById('bg-canvas');
-  if(!window.THREE || !canvas) return;
-
-  let renderer;
-  try{ renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true }); }catch(e){ return; }
-
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0xE9F4FC, 0.045);
-
-  const camera = new THREE.PerspectiveCamera(40, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 8.4);
-
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  scene.add(new THREE.AmbientLight(0xdcf0ff, 1.15));
-  const key = new THREE.PointLight(0xbfe0ff, 3.2, 26);
-  key.position.set(5, 4, 6);
-  scene.add(key);
-  const rim = new THREE.PointLight(0xffffff, 1.6, 26);
-  rim.position.set(-4, -2, 4);
-  scene.add(rim);
-  const warm = new THREE.PointLight(0xc6821a, 1.4, 20);
-  warm.position.set(1, -2, 3);
-  scene.add(warm);
-
-  const rig = new THREE.Group();
-  rig.position.set(1.9, 0.1, -1.2);
-  rig.rotation.set(1.0, 0.3, 0.15);
-  scene.add(rig);
-
-  const chrome = new THREE.MeshPhysicalMaterial({ color:0xcfd6d8, metalness:1, roughness:0.28, clearcoat:0.6, clearcoatRoughness:0.25 });
-  const chromeBright = new THREE.MeshPhysicalMaterial({ color:0xf1f4f5, metalness:1, roughness:0.1, clearcoat:1, clearcoatRoughness:0.1 });
-
-  const outerRace = new THREE.Mesh(new THREE.TorusGeometry(2.0, 0.22, 24, 90), chrome);
-  rig.add(outerRace);
-
-  const innerRace = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.17, 24, 90), chrome);
-  rig.add(innerRace);
-
-  const cage = new THREE.Group();
-  const ballCount = 12;
-  const ballGeo = new THREE.SphereGeometry(0.16, 24, 24);
-  for(let i=0;i<ballCount;i++){
-    const ang = (i/ballCount) * Math.PI*2;
-    const ball = new THREE.Mesh(ballGeo, chromeBright);
-    ball.position.set(Math.cos(ang)*1.53, Math.sin(ang)*1.53, 0);
-    cage.add(ball);
-  }
-  rig.add(cage);
-
-  // amber oil ribbon flowing over the bearing
-  const oilPts = [
-    new THREE.Vector3(0.2, 2.7, 0.6),
-    new THREE.Vector3(0.9, 2.0, 0.3),
-    new THREE.Vector3(1.6, 1.1, 0.5),
-    new THREE.Vector3(1.9, 0.1, 0.7),
-    new THREE.Vector3(1.5, -1.0, 0.4),
-    new THREE.Vector3(0.6, -1.9, 0.6),
-    new THREE.Vector3(-0.3, -2.6, 0.3)
-  ];
-  const oilCurve = new THREE.CatmullRomCurve3(oilPts);
-  const oilGeo = new THREE.TubeGeometry(oilCurve, 140, 0.085, 14, false);
-  const oilMat = new THREE.MeshPhysicalMaterial({
-    color:0xe2a73d, metalness:0.05, roughness:0.12, clearcoat:1, clearcoatRoughness:0.05,
-    transparent:true, opacity:0.88, emissive:0x6b3b0c, emissiveIntensity:0.18
-  });
-  const oilTube = new THREE.Mesh(oilGeo, oilMat);
-  rig.add(oilTube);
-
-  // droplets flowing along the same curve
-  const dropGeo = new THREE.SphereGeometry(0.075, 16, 16);
-  const dropMat = new THREE.MeshPhysicalMaterial({ color:0xf3c065, metalness:0, roughness:0.05, clearcoat:1, emissive:0x7a4310, emissiveIntensity:0.3, transparent:true, opacity:0.95 });
-  const drops = [];
-  const dropCount = 5;
-  for(let i=0;i<dropCount;i++){
-    const d = new THREE.Mesh(dropGeo, dropMat);
-    rig.add(d);
-    drops.push({ mesh:d, offset:i/dropCount });
-  }
-
-  let mouseX = 0, mouseY = 0, targetRotX = 0, targetRotY = 0;
-  window.addEventListener('mousemove', e => {
-    mouseX = (e.clientX/window.innerWidth) - 0.5;
-    mouseY = (e.clientY/window.innerHeight) - 0.5;
-  });
-
-  function onResize(){
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  }
-  window.addEventListener('resize', onResize);
-
-  const clock = new THREE.Clock();
-  function animate(){
-    requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
-
-    innerRace.rotation.z = t*0.9;
-    cage.rotation.z = t*0.42;
-
-    targetRotX += (mouseY*0.35 - targetRotX) * 0.04;
-    targetRotY += (mouseX*0.4 - targetRotY) * 0.04;
-    rig.rotation.x = 1.0 + targetRotX;
-    rig.rotation.y = 0.3 + Math.sin(t*0.15)*0.08 + targetRotY;
-
-    drops.forEach((d, i) => {
-      const tt = ((t*0.09) + d.offset) % 1;
-      const p = oilCurve.getPointAt(tt);
-      d.mesh.position.copy(p);
-      const s = 0.7 + Math.sin(tt*Math.PI)*0.6;
-      d.mesh.scale.setScalar(s);
-    });
-
-    const scrollT = Math.min(1, window.scrollY / (document.body.scrollHeight - window.innerHeight || 1));
-    camera.position.y = -scrollT*1.2;
-    camera.position.x = mouseX*0.35;
-
-    renderer.render(scene, camera);
-  }
-  if(!reduceMotion){ animate(); }
-  else { renderer.render(scene, camera); }
-})();
-</script>
-  <!-- jQuery & WebGL Ripples Engine -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.4/jquery.ripples.min.js"></script>
-
-<script>
-  $(document).ready(function() {
-    var $bg = $('.hd-lube-bg');
-
-    try {
-      // Initialize WebGL Ripples
-      $bg.ripples({
-        resolution: 512,
-        dropRadius: 22,
-        perturbance: 0.04,
-        interactive: false // Handled manually for full-page precision
-      });
-
-      // Track cursor everywhere across the full window
-      $(window).on('mousemove', function(e) {
-        $bg.ripples('drop', e.clientX, e.clientY, 18, 0.035);
-      });
-
-      // Add stronger drop wave on click
-      $(window).on('click', function(e) {
-        $bg.ripples('drop', e.clientX, e.clientY, 32, 0.07);
-      });
-
-    } catch (err) {
-      console.warn('WebGL Ripples failed:', err);
-    }
-  });
-</script>
-<script>
+/* ---------------- BACKGROUND LIQUID RIPPLE ---------------- */
 (function() {
   const canvas = document.getElementById('oil-ripple-canvas');
   const dispMap = document.getElementById('displacement-map');
@@ -949,7 +791,6 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
 
     ctx.clearRect(0, 0, width, height);
 
-    // 1. Deep Obsidian Gradient Base
     const bgGrad = ctx.createLinearGradient(0, 0, width, height);
     bgGrad.addColorStop(0, '#060911');
     bgGrad.addColorStop(0.5, '#0B0F19');
@@ -957,7 +798,6 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Glowing Liquid Titanium & Cyan Waves
     for (let i = 0; i < numWaves; i++) {
       ctx.beginPath();
       
@@ -992,7 +832,6 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
       ctx.fillStyle = waveGrad;
       ctx.fill();
 
-      // Glowing Neon Wave Crest Lines
       ctx.lineWidth = 1;
       ctx.strokeStyle = `rgba(56, 189, 248, ${0.25 - i * 0.015})`;
       ctx.stroke();
@@ -1004,7 +843,5 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
   animate();
 })();
 </script>
-</body>
-</html>
 </body>
 </html>
