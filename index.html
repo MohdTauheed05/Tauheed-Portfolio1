@@ -164,29 +164,56 @@
   .hero-loc{ text-align:right; font-family:var(--mono); font-size:12px; color:var(--steel); }
   .hero-loc b{ color:var(--ink); display:block; font-size:13px; margin-bottom:3px; font-weight:500; }
 
-  /* Portrait Card */
+  /* ---------- PORTRAIT / CIRCULAR BEARING CONTAINER ---------- */
   .portrait-card{
     background:var(--surface); border:1px solid var(--line); border-radius:32px; padding:22px;
     box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .5s cubic-bezier(.2,.8,.2,1);
     max-width:320px; margin:0 auto;
   }
-  .portrait-frame{ border-radius:22px; overflow:hidden; aspect-ratio:4/5; background:var(--surface2); perspective:600px; }
-  .portrait-frame img{ width:100%; height:100%; object-fit:cover; animation:portraitIdle 7s ease-in-out infinite; }
-  @keyframes portraitIdle{ 0%,100%{ transform:scale(1.02) rotateY(-3deg); } 50%{ transform:scale(1.02) rotateY(3deg); } }
+  
+  /* CIRCULAR BEARING FIX: Forces image to render inside a rotating circle */
+  .portrait-frame, 
+  .bearing-frame { 
+    border-radius: 50% !important; /* Enforces absolute circular shape */
+    overflow: hidden !important; 
+    aspect-ratio: 1 / 1; 
+    background: var(--bg2); 
+    position: relative;
+    border: 2px solid var(--amber);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .portrait-frame img, 
+  .bearing-frame img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    border-radius: 50%;
+    animation: rotateBearing 14s linear infinite; 
+  }
+
+  /* Motion spin keyframes for bearing animation */
+  @keyframes rotateBearing { 
+    0% { transform: rotate(0deg); } 
+    100% { transform: rotate(360deg); } 
+  }
+
   .portrait-meta{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; }
   .portrait-name{ font-family:var(--display); font-weight:700; font-size:15px; color:var(--ink); }
   .portrait-role{ font-family:var(--mono); font-size:10.5px; color:var(--steel); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
   .portrait-dot{ width:10px; height:10px; border-radius:50%; background:#00E5FF; box-shadow:0 0 10px 2px rgba(0,229,255,0.6); }
 
   /* ---------- SECTIONS ---------- */
-  section{ padding:140px 0; }
+  section{ padding:140px 0; perspective:1400px; }
   .sec-head{ display:flex; flex-direction:column; gap:16px; margin-bottom:60px; max-width:680px; }
   .sec-head h2{ font-size:clamp(1.9rem,4vw,3rem); color:var(--ink); }
   .sec-sub{ color:var(--ink-dim); font-size:15.5px; max-width:520px; }
 
   .reveal{ opacity:0; transform:translateY(34px) rotateX(8deg); transform-style:preserve-3d; transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
   .reveal.in{ opacity:1; transform:translateY(0) rotateX(0deg); }
-  section{ perspective:1400px; }
   .reveal-delay-1.in{ transition-delay:.08s; }
   .reveal-delay-2.in{ transition-delay:.16s; }
   .reveal-delay-3.in{ transition-delay:.24s; }
@@ -265,6 +292,39 @@
   .edu-detail{ color:var(--ink-dim); font-size:14px; margin-top:6px; }
   .edu-years{ font-family:var(--mono); font-size:13px; color:var(--steel); white-space:nowrap; }
 
+  /* ---------- RESPONSIVE VIDEO WRAPPER ---------- */
+  .video-section, 
+  .video-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 40px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow);
+  }
+  .video-wrapper iframe,
+  .video-wrapper video,
+  .video-wrapper embed,
+  .video-wrapper object {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+  }
+
   /* ---------- CONTACT ---------- */
   #contact{ background:transparent; text-align:center; }
   .contact-inner{ max-width:700px; margin:0 auto; }
@@ -281,7 +341,7 @@
     html{ scroll-behavior:auto; }
     .reveal{ transition:none; opacity:1; transform:none; }
     .cursor-dot{ display:none; }
-    .portrait-frame img{ animation:none !important; }
+    .portrait-frame img, .bearing-frame img{ animation:none !important; }
   }
 </style>
 </head>
