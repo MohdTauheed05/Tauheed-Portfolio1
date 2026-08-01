@@ -9,39 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- Load jQuery and the WebGL Ripples Plugin -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.4/jquery.ripples.min.js"></script>
-
-<!-- Initialize the Oil Ripple effect -->
-<script>
-$(document).ready(function() {
-  const $bg = $('.hd-lube-bg');
-
-  try {
-    // 1. Initialize WebGL Ripples
-    $bg.ripples({
-      resolution: 512,       // Ripple smoothness
-      dropRadius: 25,        // Ripple size (thicker for oil look)
-      perturbance: 0.04,     // Viscosity / refraction intensity
-      interactive: false     // We handle full-page mouse events manually below
-    });
-
-    // 2. Track mouse movement ANYWHERE on the window
-    $(window).on('mousemove', function(e) {
-      // Use clientX / clientY for fixed position alignment
-      $bg.ripples('drop', e.clientX, e.clientY, 18, 0.035);
-    });
-
-    // 3. Optional: Add a ripple on click
-    $(window).on('click', function(e) {
-      $bg.ripples('drop', e.clientX, e.clientY, 35, 0.08);
-    });
-
-  } catch (e) {
-    console.warn("WebGL Ripples failed to initialize:", e);
-  }
-});
-</script>
 <style>
   :root{
     --bg:#E9F4FC;
@@ -89,23 +56,21 @@ $(document).ready(function() {
   }
 
   /* Update .hd-lube-bg */
-.hd-lube-bg {
-  position: fixed; 
-  inset: 0; 
-  z-index: 1; /* Elevated above background canvas */
-  pointer-events: none; /* Allows mouse events to pass through to sections */
-  background-image: url('images/grease.jpg');
-  background-size: cover; 
-  background-position: center;
-  opacity: 0.22; /* Increased opacity so ripples are clearly visible */
-  filter: saturate(1.2) contrast(1.1);
-}
+.hd-lube-bg{
+    position:fixed; inset:0; z-index:1; 
+    pointer-events:none; /* Lets cursor interact with buttons beneath */
+    background-image:url('images/grease.jpg');
+    background-size:cover; 
+    background-position:center;
+    opacity:0.25; /* Higher opacity makes the wave distortions clearly visible */
+    filter:saturate(1.2) contrast(1.1);
+  }
 
-/* Allow ripples to be visible through background sections */
-#about, #skills, #contact {
-  background: rgba(245, 250, 255, 0.82) !important;
-  backdrop-filter: blur(4px);
-}
+  /* Allows WebGL ripples to shine through background sections */
+  #about, #skills, #contact {
+    background: rgba(245, 250, 255, 0.82) !important;
+    backdrop-filter: blur(4px);
+  }
 
   .grain{
     position:fixed; inset:0; z-index:1; pointer-events:none;
@@ -912,5 +877,39 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
   else { renderer.render(scene, camera); }
 })();
 </script>
+  <!-- jQuery & WebGL Ripples Engine -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.4/jquery.ripples.min.js"></script>
+
+<script>
+  $(document).ready(function() {
+    var $bg = $('.hd-lube-bg');
+
+    try {
+      // Initialize WebGL Ripples
+      $bg.ripples({
+        resolution: 512,
+        dropRadius: 22,
+        perturbance: 0.04,
+        interactive: false // Handled manually for full-page precision
+      });
+
+      // Track cursor everywhere across the full window
+      $(window).on('mousemove', function(e) {
+        $bg.ripples('drop', e.clientX, e.clientY, 18, 0.035);
+      });
+
+      // Add stronger drop wave on click
+      $(window).on('click', function(e) {
+        $bg.ripples('drop', e.clientX, e.clientY, 32, 0.07);
+      });
+
+    } catch (err) {
+      console.warn('WebGL Ripples failed:', err);
+    }
+  });
+</script>
+</body>
+</html>
 </body>
 </html>
