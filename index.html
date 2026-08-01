@@ -10,22 +10,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- Load jQuery and the WebGL Ripples Plugin -->
 <style>
-  :root{
-    --bg:#E9F4FC;
-    --bg2:#F5FAFF;
+:root{
+    --bg:#F9F4E8;
+    --bg2:#FFFDF9;
     --surface:#FFFFFF;
-    --surface2:#E4F1FB;
-    --ink:#0C2338;
-    --ink-dim:#3E617D;
-    --amber:#1D6FB8;
-    --amber2:#4FA8E8;
-    --rust:#0B3A63;
-    --oil:#E2A73D;
-    --oil2:#C6821A;
-    --steel:#5E7A90;
-    --line:rgba(11,58,99,0.14);
-    --line-strong:rgba(11,58,99,0.26);
-    --shadow: 0 26px 50px -28px rgba(11,58,99,0.28);
+    --surface2:#F4EAD3;
+    --ink:#2C2214;
+    --ink-dim:#63523D;
+    --amber:#D49B28;
+    --amber2:#E6B84C;
+    --rust:#8C5911;
+    --oil:#E5AA33;
+    --oil2:#B87D14;
+    --steel:#8E7E6B;
+    --line:rgba(140,89,17,0.15);
+    --line-strong:rgba(140,89,17,0.28);
+    --shadow: 0 26px 50px -28px rgba(140,89,17,0.2);
     --display: 'Syne', sans-serif;
     --body: 'Inter', sans-serif;
     --mono: 'JetBrains Mono', monospace;
@@ -901,11 +901,12 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
     }
   });
 </script>
-  <script>
+<script>
 (function() {
   const canvas = document.getElementById('oil-ripple-canvas');
-  if(!canvas) return;
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
+
   let width = canvas.width = window.innerWidth;
   let height = canvas.height = window.innerHeight;
 
@@ -918,40 +919,58 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
 
   // Track cursor movement across full page
   window.addEventListener('mousemove', (e) => {
+    // Adds a smooth fluid oil wave on mouse movement
     ripples.push({
       x: e.clientX,
       y: e.clientY,
-      radius: 2,
-      maxRadius: 80,
-      alpha: 0.45,
-      speed: 1.8
+      radius: 4,
+      maxRadius: 110,
+      alpha: 0.55,
+      speed: 1.4,
+      waveOffset: Math.random() * Math.PI * 2
     });
   });
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
 
+    // Render soft ambient light-gold background sheen
+    const grad = ctx.createRadialGradient(width * 0.7, height * 0.2, 50, width * 0.5, height * 0.5, width);
+    grad.addColorStop(0, '#FFFBF2');
+    grad.addColorStop(0.5, '#F9F3E5');
+    grad.addColorStop(1, '#F2E5CA');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+
     for (let i = ripples.length - 1; i >= 0; i--) {
       const r = ripples[i];
       r.radius += r.speed;
-      r.alpha -= 0.008;
+      r.alpha -= 0.006;
 
       if (r.alpha <= 0 || r.radius >= r.maxRadius) {
         ripples.splice(i, 1);
         continue;
       }
 
+      // Golden Oil Refraction Wave 1 (Inner Highlight)
       ctx.beginPath();
       ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(11, 58, 99, ${r.alpha})`; // Matches your oil/dark accent theme
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = `rgba(229, 170, 51, ${r.alpha})`; // Warm Amber Gold
+      ctx.lineWidth = 3.5;
       ctx.stroke();
 
-      // Outer refraction ring
+      // Golden Oil Refraction Wave 2 (Outer Liquid Ring)
       ctx.beginPath();
-      ctx.arc(r.x, r.y, Math.max(0, r.radius - 8), 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(29, 111, 184, ${r.alpha * 0.5})`;
-      ctx.lineWidth = 1;
+      ctx.arc(r.x, r.y, Math.max(0, r.radius - 12), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(184, 125, 20, ${r.alpha * 0.45})`; // Darker Viscous Edge
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Subtle Soft Golden Glow
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, Math.max(0, r.radius - 4), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(255, 235, 170, ${r.alpha * 0.6})`;
+      ctx.lineWidth = 1.5;
       ctx.stroke();
     }
 
