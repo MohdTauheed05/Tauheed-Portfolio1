@@ -358,8 +358,7 @@
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-<div class="hd-lube-bg"></div>
+<canvas id="oil-ripple-canvas" style="position:fixed; inset:0; width:100vw; height:100vh; z-index:0; pointer-events:none;"></canvas>
 <div class="grain"></div>
 <div class="cursor-dot" id="cursorDot"></div>
 
@@ -901,6 +900,66 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
       console.warn('WebGL Ripples failed:', err);
     }
   });
+</script>
+  <script>
+(function() {
+  const canvas = document.getElementById('oil-ripple-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let width = canvas.width = window.innerWidth;
+  let height = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const ripples = [];
+
+  // Track cursor movement across full page
+  window.addEventListener('mousemove', (e) => {
+    ripples.push({
+      x: e.clientX,
+      y: e.clientY,
+      radius: 2,
+      maxRadius: 80,
+      alpha: 0.45,
+      speed: 1.8
+    });
+  });
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const r = ripples[i];
+      r.radius += r.speed;
+      r.alpha -= 0.008;
+
+      if (r.alpha <= 0 || r.radius >= r.maxRadius) {
+        ripples.splice(i, 1);
+        continue;
+      }
+
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(11, 58, 99, ${r.alpha})`; // Matches your oil/dark accent theme
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // Outer refraction ring
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, Math.max(0, r.radius - 8), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(29, 111, 184, ${r.alpha * 0.5})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
 </script>
 </body>
 </html>
